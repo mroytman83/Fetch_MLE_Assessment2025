@@ -1,24 +1,22 @@
 ENV_NAME=fetch_env
 
-.PHONY: env activate install test writeup run_all
-
-writeup:
-	@echo "Write-up can be found in writeup.md"
+.PHONY: env install test writeup run_all
 
 env:
 	python -m venv $(ENV_NAME)
 
 
-activate:
-	source $(ENV_NAME)/bin/activate
+install: env
+	$(ENV_NAME)/bin/pip install -r requirements.txt
 
 
-install: 
-	pip install -r requirements.txt
+test: install
+	$(ENV_NAME)/bin/python assessment.py
 
 
-test:
-	python assessment.py
+writeup:
+	@echo "Write-up can be found in writeup.md"
 
 
-run_all: env activate install test writeup
+run_all: env install test writeup
+

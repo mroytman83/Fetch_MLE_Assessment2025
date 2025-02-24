@@ -3,4 +3,4 @@
 
 Run this command for assessment evaluation
 
-```make run_all``
+```make run_all```
