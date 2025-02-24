@@ -5,9 +5,9 @@ from model.multitask import SentenceTransformerMultiTask
 from transformers import BertTokenizer, BertModel
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
+import torch.nn.functional as F
 import torch
 import torch.nn as nn
-import pandas as pd
 import time
 
 #tokenizer
@@ -16,18 +16,14 @@ tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 #multi-task model
 model = SentenceTransformerMultiTask()
 
-#testing dataset for Task1
-splits = {'train': 'data/train-00000-of-00001.parquet', 'validation': 'data/validation-00000-of-00001.parquet', 'test': 'data/test-00000-of-00001.parquet'}
-task1_df = pd.read_parquet("hf://datasets/sentence-transformers/stsb/" + splits["train"])
-
 def task1_eval():
 
     # Tokenize Inputs
     tokens = tokenizer(
 
         [
-            task1_df["sentence1"][0],
-            task1_df["sentence2"][0]
+            "A plane is taking off.",
+            "An air plane is taking off."
         ],
 
         padding=True,
@@ -53,8 +49,10 @@ def task2_eval():
     inputs = tokenizer(["This is a great day!", "I hate the weather today!"], padding=True, truncation=True, return_tensors="pt")
 
     classification_output, sentiment_output = model(inputs["input_ids"], inputs["attention_mask"])
+    #classification outputs are raw logits
+    classification_probs = F.softmax(classification_output, dim=1)
 
-    answ_dict["Sentence Classification Output:"]=classification_output
+    answ_dict["Sentence Classification Output:"]=classification_probs
     answ_dict["Sentiment Analysis Output:"]=sentiment_output
 
     print("Evaluating Task2")
